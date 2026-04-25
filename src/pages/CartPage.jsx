@@ -9,6 +9,7 @@ export default function CartPage({ session }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [checkingOut, setCheckingOut] = useState(false)
+  const [deliveryDate, setDeliveryDate] = useState('')
 
   useEffect(() => { fetchCart() }, [])
 
@@ -49,7 +50,7 @@ export default function CartPage({ session }) {
         return sum + (p ? parseFloat(p.price) * item.quantity : 0)
       }, 0)
       const { data: order, error: orderErr } = await supabase.from('orders')
-        .insert({ user_id: session.user.id, total_amount: total, status: 'pending' })
+        .insert({ user_id: session.user.id, total_amount: total, status: 'pending', delivery_date: deliveryDate || null })
         .select().single()
       if (orderErr) throw orderErr
       const orderItems = cartItems.map(item => ({
@@ -150,6 +151,16 @@ export default function CartPage({ session }) {
                     <span>Total</span>
                     <span>${total.toFixed(2)}</span>
                   </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Delivery Date <span className="text-slate-400 font-normal">(optional)</span></label>
+                  <input
+                    type="date"
+                    value={deliveryDate}
+                    onChange={e => setDeliveryDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  />
                 </div>
                 <button
                   onClick={checkout}

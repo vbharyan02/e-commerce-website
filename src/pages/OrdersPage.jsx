@@ -89,6 +89,13 @@ export default function OrdersPage({ session }) {
                     {order.shipping_address && (
                       <p className="text-sm text-slate-400 mt-1">📍 {order.shipping_address}</p>
                     )}
+                    <p className="text-sm text-slate-500 mt-1">
+                      <span className="font-medium">Delivery:</span>{' '}
+                      {order.delivery_date
+                        ? new Date(order.delivery_date + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                        : <span className="text-slate-400">Not scheduled</span>
+                      }
+                    </p>
                   </div>
                   <span className={`text-xs font-semibold capitalize px-3 py-1.5 rounded-full flex-shrink-0 ${STATUS_STYLES[order.status] || 'bg-slate-50 text-slate-600 border border-slate-200'}`}>
                     {order.status}
