@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import supabase from '../lib/supabase'
 
-const STATUS_COLOR = {
-  pending: 'text-yellow-600',
-  confirmed: 'text-blue-600',
-  shipped: 'text-purple-600',
-  delivered: 'text-green-600',
-  cancelled: 'text-red-500'
+const STATUS_STYLES = {
+  pending:   'bg-amber-50 text-amber-600 border border-amber-200',
+  confirmed: 'bg-blue-50 text-blue-600 border border-blue-200',
+  shipped:   'bg-purple-50 text-purple-600 border border-purple-200',
+  delivered: 'bg-emerald-50 text-emerald-600 border border-emerald-200',
+  cancelled: 'bg-red-50 text-red-500 border border-red-200',
 }
 
 export default function OrdersPage({ session }) {
@@ -25,11 +25,8 @@ export default function OrdersPage({ session }) {
       const { data, error } = await supabase.from('orders').select('*')
         .eq('user_id', session.user.id).order('created_at', { ascending: false })
       if (error) {
-        if (error.message.includes('does not exist') || error.message.includes('schema cache')) {
-          setError('Something went wrong. Please try again later.')
-        } else {
-          setError(error.message)
-        }
+        setError(error.message.includes('does not exist') || error.message.includes('schema cache')
+          ? 'Something went wrong. Please try again later.' : error.message)
         return
       }
       setOrders(data)
@@ -40,42 +37,68 @@ export default function OrdersPage({ session }) {
     }
   }
 
-  if (isLoading) return <div className="text-center py-8">Loading...</div>
-  if (error) return <div className="text-red-500 text-center py-8">{error}</div>
+  if (isLoading) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent" />
+    </div>
+  )
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 px-4 pb-12">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Your Orders</h1>
-        <div className="flex gap-3 text-sm">
-          <Link to="/cart" className="text-blue-600">Cart</Link>
-          <Link to="/" className="text-blue-600">Shop</Link>
-          <button onClick={() => supabase.auth.signOut().then(() => navigate('/login'))}
-            className="text-gray-500 hover:text-gray-700">Logout</button>
+    <div className="min-h-screen bg-slate-50">
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link to="/" className="text-xl font-bold text-indigo-600 tracking-tight">ShopApp</Link>
+          <div className="flex items-center gap-4 text-sm">
+            <Link to="/cart" className="text-slate-600 hover:text-indigo-600 transition-colors font-medium">Cart</Link>
+            <Link to="/" className="text-slate-600 hover:text-indigo-600 transition-colors font-medium">Shop</Link>
+            <button
+              onClick={() => supabase.auth.signOut().then(() => navigate('/login'))}
+              className="text-slate-400 hover:text-slate-600 transition-colors"
+            >Logout</button>
+          </div>
         </div>
-      </div>
-      {orders.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          No orders yet. <Link to="/" className="text-blue-600">Start shopping</Link>
-        </div>
-      ) : (
-        <ul className="space-y-3">
-          {orders.map(order => (
-            <li key={order.id} className="border rounded p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-500">{new Date(order.created_at).toLocaleDateString()}</p>
-                  <p className="font-medium mt-1">${parseFloat(order.total_amount).toFixed(2)}</p>
-                  {order.shipping_address && <p className="text-sm text-gray-500 mt-1">{order.shipping_address}</p>}
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-4 py-8 pb-16">
+        <h1 className="text-2xl font-bold text-slate-800 mb-6">Your Orders</h1>
+
+        {error && <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-4 text-sm">{error}</div>}
+
+        {orders.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+            <p className="text-5xl mb-4">📦</p>
+            <p className="text-lg font-semibold text-slate-700">No orders yet</p>
+            <p className="text-sm text-slate-400 mt-1">Your orders will appear here</p>
+            <Link to="/" className="inline-block mt-5 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-sm">
+              Start Shopping
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {orders.map((order, i) => (
+              <div key={order.id} className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">
+                      Order #{String(orders.length - i).padStart(3, '0')}
+                    </p>
+                    <p className="text-2xl font-extrabold text-slate-800 mt-1">${parseFloat(order.total_amount).toFixed(2)}</p>
+                    <p className="text-sm text-slate-500 mt-1">
+                      {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                    {order.shipping_address && (
+                      <p className="text-sm text-slate-400 mt-1">📍 {order.shipping_address}</p>
+                    )}
+                  </div>
+                  <span className={`text-xs font-semibold capitalize px-3 py-1.5 rounded-full flex-shrink-0 ${STATUS_STYLES[order.status] || 'bg-slate-50 text-slate-600 border border-slate-200'}`}>
+                    {order.status}
+                  </span>
                 </div>
-                <span className={`text-sm font-medium capitalize ${STATUS_COLOR[order.status] || 'text-gray-600'}`}>
-                  {order.status}
-                </span>
               </div>
-            </li>
-          ))}
-        </ul>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
