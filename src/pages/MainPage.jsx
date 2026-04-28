@@ -32,6 +32,7 @@ export default function MainPage({ session, darkMode, toggleDarkMode }) {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const [stock, setStock] = useState('')
+  const [listingDate, setListingDate] = useState('')
   const [formError, setFormError] = useState(null)
   const [cartMsg, setCartMsg] = useState(null)
   const [cartCount, setCartCount] = useState(0)
@@ -73,11 +74,11 @@ export default function MainPage({ session, darkMode, toggleDarkMode }) {
     if (!stock || isNaN(stock) || parseInt(stock) < 0) { setFormError('Valid stock is required'); return }
     const { data: { user } } = await supabase.auth.getUser()
     const { data, error } = await supabase.from('products')
-      .insert({ user_id: user.id, name: name.trim(), price: parseFloat(price), stock: parseInt(stock) })
+      .insert({ user_id: user.id, name: name.trim(), price: parseFloat(price), stock: parseInt(stock), listing_date: listingDate || null })
       .select().single()
     if (error) { setFormError(error.message); return }
     setProducts(prev => [data, ...prev])
-    setName(''); setPrice(''); setStock('')
+    setName(''); setPrice(''); setStock(''); setListingDate('')
   }
 
   async function handleDelete(id) {
@@ -171,6 +172,11 @@ export default function MainPage({ session, darkMode, toggleDarkMode }) {
                   className="flex-1 border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-slate-800 dark:text-gray-100 placeholder-slate-400 dark:placeholder-gray-400 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
+              <input
+                value={listingDate} onChange={e => setListingDate(e.target.value)}
+                type="date"
+                className="border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-slate-800 dark:text-gray-100 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 w-full"
+              />
               {formError && <p className="text-red-500 text-sm">{formError}</p>}
               <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm">
                 Add Product
@@ -205,6 +211,9 @@ export default function MainPage({ session, darkMode, toggleDarkMode }) {
                   <p className={`text-xs mt-1 font-medium ${product.stock > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                     {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                   </p>
+                  {product.listing_date && (
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Listed: {product.listing_date}</p>
+                  )}
                   <div className="flex items-center gap-2 mt-4">
                     <button
                       onClick={() => addToCart(product)}
