@@ -10,7 +10,7 @@ const STATUS_STYLES = {
   cancelled: 'bg-red-50 text-red-500 border border-red-200',
 }
 
-export default function OrdersPage({ session }) {
+export default function OrdersPage({ session, darkMode, toggleDarkMode }) {
   const navigate = useNavigate()
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -38,37 +38,44 @@ export default function OrdersPage({ session }) {
   }
 
   if (isLoading) return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-900 flex items-center justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent" />
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-slate-100 dark:border-gray-700 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-bold text-indigo-600 tracking-tight">ShopApp</Link>
           <div className="flex items-center gap-4 text-sm">
-            <Link to="/cart" className="text-slate-600 hover:text-indigo-600 transition-colors font-medium">Cart</Link>
-            <Link to="/" className="text-slate-600 hover:text-indigo-600 transition-colors font-medium">Shop</Link>
+            <Link to="/cart" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">Cart</Link>
+            <Link to="/" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">Shop</Link>
             <button
               onClick={() => supabase.auth.signOut().then(() => navigate('/login'))}
-              className="text-slate-400 hover:text-slate-600 transition-colors"
+              className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
             >Logout</button>
+            <button
+              onClick={toggleDarkMode}
+              className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors text-lg"
+              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {darkMode ? '☀️' : '🌙'}
+            </button>
           </div>
         </div>
       </nav>
 
       <div className="max-w-4xl mx-auto px-4 py-8 pb-16">
-        <h1 className="text-2xl font-bold text-slate-800 mb-6">Your Orders</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-gray-100 mb-6">Your Orders</h1>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-4 text-sm">{error}</div>}
+        {error && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-xl px-4 py-3 mb-4 text-sm">{error}</div>}
 
         {orders.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+          <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
             <p className="text-5xl mb-4">📦</p>
-            <p className="text-lg font-semibold text-slate-700">No orders yet</p>
-            <p className="text-sm text-slate-400 mt-1">Your orders will appear here</p>
+            <p className="text-lg font-semibold text-slate-700 dark:text-gray-200">No orders yet</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Your orders will appear here</p>
             <Link to="/" className="inline-block mt-5 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-sm">
               Start Shopping
             </Link>
@@ -76,24 +83,24 @@ export default function OrdersPage({ session }) {
         ) : (
           <div className="space-y-4">
             {orders.map((order, i) => (
-              <div key={order.id} className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+              <div key={order.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest font-semibold">
                       Order #{String(orders.length - i).padStart(3, '0')}
                     </p>
-                    <p className="text-2xl font-extrabold text-slate-800 mt-1">${parseFloat(order.total_amount).toFixed(2)}</p>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-2xl font-extrabold text-slate-800 dark:text-gray-100 mt-1">${parseFloat(order.total_amount).toFixed(2)}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                       {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                     {order.shipping_address && (
-                      <p className="text-sm text-slate-400 mt-1">📍 {order.shipping_address}</p>
+                      <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">📍 {order.shipping_address}</p>
                     )}
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                       <span className="font-medium">Delivery:</span>{' '}
                       {order.delivery_date
                         ? new Date(order.delivery_date + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-                        : <span className="text-slate-400">Not scheduled</span>
+                        : <span className="text-slate-400 dark:text-slate-500">Not scheduled</span>
                       }
                     </p>
                   </div>

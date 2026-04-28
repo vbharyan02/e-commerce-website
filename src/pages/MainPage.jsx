@@ -13,18 +13,18 @@ const GRADIENTS = [
 
 function ProductSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden animate-pulse">
-      <div className="h-24 bg-slate-200" />
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden animate-pulse">
+      <div className="h-24 bg-slate-200 dark:bg-gray-700" />
       <div className="p-4 space-y-2">
-        <div className="h-4 bg-slate-200 rounded w-3/4" />
-        <div className="h-4 bg-slate-200 rounded w-1/3" />
-        <div className="h-8 bg-slate-200 rounded mt-4" />
+        <div className="h-4 bg-slate-200 dark:bg-gray-700 rounded w-3/4" />
+        <div className="h-4 bg-slate-200 dark:bg-gray-700 rounded w-1/3" />
+        <div className="h-8 bg-slate-200 dark:bg-gray-700 rounded mt-4" />
       </div>
     </div>
   )
 }
 
-export default function MainPage({ session }) {
+export default function MainPage({ session, darkMode, toggleDarkMode }) {
   const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -101,15 +101,15 @@ export default function MainPage({ session }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-slate-100 dark:border-gray-700 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <span className="text-xl font-bold text-indigo-600 tracking-tight">ShopApp</span>
           <div className="flex items-center gap-5 text-sm">
             {cartMsg && <span className="text-emerald-600 font-medium">{cartMsg}</span>}
             {session ? (
               <>
-                <Link to="/cart" className="relative text-slate-600 hover:text-indigo-600 transition-colors font-medium">
+                <Link to="/cart" className="relative text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">
                   Cart
                   {cartCount > 0 && (
                     <span className="absolute -top-2 -right-3 bg-indigo-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center leading-none">
@@ -117,10 +117,10 @@ export default function MainPage({ session }) {
                     </span>
                   )}
                 </Link>
-                <Link to="/orders" className="text-slate-600 hover:text-indigo-600 transition-colors font-medium">Orders</Link>
+                <Link to="/orders" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">Orders</Link>
                 <button
                   onClick={() => supabase.auth.signOut().then(() => navigate('/login'))}
-                  className="text-slate-400 hover:text-slate-600 transition-colors"
+                  className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                 >Logout</button>
               </>
             ) : (
@@ -128,6 +128,13 @@ export default function MainPage({ session }) {
                 Sign In
               </Link>
             )}
+            <button
+              onClick={toggleDarkMode}
+              className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors text-lg"
+              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {darkMode ? '☀️' : '🌙'}
+            </button>
           </div>
         </div>
       </nav>
@@ -145,23 +152,23 @@ export default function MainPage({ session }) {
         </div>
 
         {session && (
-          <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">List a New Product</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-8">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-gray-100 mb-4">List a New Product</h2>
             <form onSubmit={handleCreate} className="space-y-3">
               <input
                 value={name} onChange={e => setName(e.target.value)} placeholder="Product name"
-                className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                className="w-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-slate-800 dark:text-gray-100 placeholder-slate-400 dark:placeholder-gray-400 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
               />
               <div className="flex gap-3">
                 <input
                   value={price} onChange={e => setPrice(e.target.value)} placeholder="Price ($)"
                   type="number" step="0.01" min="0"
-                  className="flex-1 border border-slate-200 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  className="flex-1 border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-slate-800 dark:text-gray-100 placeholder-slate-400 dark:placeholder-gray-400 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                 />
                 <input
                   value={stock} onChange={e => setStock(e.target.value)} placeholder="Stock qty"
                   type="number" min="0"
-                  className="flex-1 border border-slate-200 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  className="flex-1 border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-slate-800 dark:text-gray-100 placeholder-slate-400 dark:placeholder-gray-400 rounded-lg px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
               {formError && <p className="text-red-500 text-sm">{formError}</p>}
@@ -177,23 +184,23 @@ export default function MainPage({ session }) {
             {[...Array(6)].map((_, i) => <ProductSkeleton key={i} />)}
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-center py-8 rounded-2xl">{error}</div>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-center py-8 rounded-2xl">{error}</div>
         ) : products.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+          <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
             <p className="text-5xl mb-4">🛍️</p>
-            <p className="text-lg font-semibold text-slate-700">No products yet</p>
-            <p className="text-sm text-slate-400 mt-1">Be the first to list one above!</p>
+            <p className="text-lg font-semibold text-slate-700 dark:text-gray-200">No products yet</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Be the first to list one above!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product, i) => (
-              <div key={product.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden group">
+              <div key={product.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden group">
                 <div className={`h-24 bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]}`} />
                 <div className="p-4">
-                  <Link to={`/product/${product.id}`} className="font-semibold text-slate-800 hover:text-indigo-600 transition-colors line-clamp-1 block">
+                  <Link to={`/product/${product.id}`} className="font-semibold text-slate-800 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors line-clamp-1 block">
                     {product.name}
                   </Link>
-                  {product.category && <p className="text-xs text-slate-400 mt-0.5">{product.category}</p>}
+                  {product.category && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{product.category}</p>}
                   <p className="text-xl font-bold text-indigo-600 mt-2">${parseFloat(product.price).toFixed(2)}</p>
                   <p className={`text-xs mt-1 font-medium ${product.stock > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                     {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
@@ -209,7 +216,7 @@ export default function MainPage({ session }) {
                     {session && product.user_id === session.user.id && (
                       <button
                         onClick={() => handleDelete(product.id)}
-                        className="text-slate-300 hover:text-red-500 transition-colors px-2 py-2 rounded-lg hover:bg-red-50 text-sm"
+                        className="text-slate-300 dark:text-slate-600 hover:text-red-500 transition-colors px-2 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-sm"
                       >✕</button>
                     )}
                   </div>
@@ -220,9 +227,9 @@ export default function MainPage({ session }) {
         )}
       </div>
 
-      <footer className="border-t border-slate-200 bg-white">
+      <footer className="border-t border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="max-w-6xl mx-auto px-4 py-8 text-center">
-          <p className="text-slate-400 text-sm">© 2025 ShopApp. All rights reserved.</p>
+          <p className="text-slate-400 dark:text-slate-500 text-sm">© 2025 ShopApp. All rights reserved.</p>
         </div>
       </footer>
     </div>
